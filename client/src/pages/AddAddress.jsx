@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { assets } from "../assets/assets";
-
-
+import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
 
 // Input Field Component
 const InputField = ({ type, placeholder, name, handleChange, address }) => (
@@ -14,38 +14,54 @@ const InputField = ({ type, placeholder, name, handleChange, address }) => (
     value={address[name]}
     required
   />
-)
+);
 
 const AddAddress = () => {
+  const { axios, user, navigate } = useAppContext();
 
+  const [address, setAddress] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    street: "",
+    city: "",
+    state: "",
+    zipcode: "",
+    country: "",
+    phone: "",
+  });
 
-    const [address, setAddress] = useState({
-            firstName: '',
-            lastName: '',
-            email: '',
-            street: '',
-            city: '',
-            state: '',
-            zipcode: '',
-            country: '',
-            phone: '',
-        })
+  const handleChange = (e) => {
+    const { name, value } = e.target;
 
-    const handleChange = (e) => {
-      const { name, value } = e.target;
+    setAddress((prevAddress) => ({
+      ...prevAddress,
+      [name]: value,
+    }));
+    console.log(address);
+  };
 
-      setAddress((prevAddress) => ({
-        ...prevAddress,
-        [name]: value,
-      }))
-      console.log(address);
+  const onSubmitHandler = async (e) => {
+    e.preventDefault();
+    try {
+      const { data } = await axios.post("/api/address/add", { address });
+
+      if (data.success) {
+        toast.success(data.message);
+        navigate("/cart");
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
+  };
 
-
-
-const onSubmitHandler = async (e)=>{
-        e.preventDefault();
-    }
+   useEffect(()=>{
+          if(!user){
+              navigate('/cart')
+          }
+      },[])
 
   return (
     <div className="mt-16 pb-16">
@@ -129,7 +145,6 @@ const onSubmitHandler = async (e)=>{
             <button className="w-full mt-6 bg-primary text-white py-3 hover:bg-primary-dull transition cursor-pointer uppercase">
               Save address
             </button>
-
           </form>
         </div>
         <img
@@ -140,6 +155,6 @@ const onSubmitHandler = async (e)=>{
       </div>
     </div>
   );
-}
+};
 
-export default AddAddress
+export default AddAddress;
