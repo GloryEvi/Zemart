@@ -4,14 +4,12 @@ import { dummyProducts } from "../assets/assets";
 import toast from "react-hot-toast";
 import axios from "axios";
 
-
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
 
-
 export const AppContext = createContext();
 
-export const AppContextProvider = ({children}) => {
+export const AppContextProvider = ({ children }) => {
   const currency = import.meta.env.VITE_CURRENCY;
 
   const navigate = useNavigate();
@@ -120,29 +118,28 @@ export const AppContextProvider = ({children}) => {
   };
 
   useEffect(() => {
-    fetchUser()
-    fetchSeller()
+    fetchUser();
+    fetchSeller();
     fetchProducts();
-    
   }, []);
 
   // Update Database Cart Items
-      useEffect(()=>{
-          const updateCart = async ()=>{
-              try {
-                  const { data } = await axios.post('/api/cart/update', {cartItems})
-                  if (!data.success){
-                      toast.error(data.message)
-                  }
-              } catch (error) {
-                  toast.error(error.message)
-              }
-          }
-  
-          if(user){
-              updateCart()
-          }
-      },[cartItems])
+  useEffect(() => {
+    const updateCart = async () => {
+      try {
+        const { data } = await axios.post("/api/cart/update", { cartItems });
+        if (!data.success) {
+          toast.error(data.message);
+        }
+      } catch (error) {
+        toast.error(error.message);
+      }
+    };
+
+    if (user) {
+      updateCart();
+    }
+  }, [cartItems]);
 
   const value = {
     navigate,
@@ -165,12 +162,11 @@ export const AppContextProvider = ({children}) => {
     axios,
     fetchProducts,
     setCartItems,
-
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
-}
+};
 
-export const useAppContext = ()=>{
-    return useContext (AppContext)
-}
+export const useAppContext = () => {
+  return useContext(AppContext);
+};
