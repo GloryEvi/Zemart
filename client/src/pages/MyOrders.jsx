@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAppContext } from "../context/AppContext";
-import { dummyOrders } from "../assets/assets";
+import { assets, dummyOrders } from "../assets/assets";
 
 const MyOrders = () => {
   const [myOrders, setMyOrders] = useState([]);
@@ -15,15 +15,13 @@ const MyOrders = () => {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
-useEffect(()=>{
-        if(user){
-       fetchMyOrders()
-        }
-    },[user])
-
-
+  useEffect(() => {
+    if (user) {
+      fetchMyOrders();
+    }
+  }, [user]);
 
   return (
     <div className="mt-16 pb-16">
@@ -54,16 +52,26 @@ useEffect(()=>{
               <div className="flex items-center mb-4 md:mb-0">
                 <div className="bg-primary/10 p-4 rounded-lg">
                   <img
-                    src={item.product.image[0]}
+                    src={
+                      item.product &&
+                      item.product.image &&
+                      item.product.image[0]
+                        ? item.product.image[0]
+                        : assets.box_icon
+                    }
                     alt=""
                     className="w-16 h-16"
                   />
                 </div>
                 <div className="ml-4">
                   <h2 className="text-xl font-medium text-gray-800">
-                    {item.product.name}
+                    {item.product
+                      ? item.product.name
+                      : "Product no longer available"}
                   </h2>
-                  <p>Category: {item.product.category}</p>
+                  <p>
+                    Category: {item.product ? item.product.category : "N/A"}
+                  </p>
                 </div>
               </div>
 
@@ -74,7 +82,9 @@ useEffect(()=>{
               </div>
               <p className="text-primary text-lg font-medium">
                 Amount: {currency}
-                {item.product.offerPrice * item.quantity}
+                {item.product && item.product.offerPrice
+                  ? item.product.offerPrice * item.quantity
+                  : "N/A"}
               </p>
             </div>
           ))}
@@ -82,6 +92,6 @@ useEffect(()=>{
       ))}
     </div>
   );
-}
+};
 
 export default MyOrders;
