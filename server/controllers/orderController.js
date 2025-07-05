@@ -228,9 +228,9 @@ export const getUserOrders = async (req, res) => {
 export const getAllOrders = async (req, res) => {
   try {
     // Add role-based access control
-    if (req.user.role !== "admin" && req.user.role !== "seller") {
-      return res.json({ success: false, message: "Access denied" });
-    }
+    // if (req.user.role !== "admin" && req.user.role !== "seller") {
+    //   return res.json({ success: false, message: "Access denied" });
+    // }
 
     const orders = await Order.find({
       $or: [{ paymentType: "COD" }, { isPaid: true }],
