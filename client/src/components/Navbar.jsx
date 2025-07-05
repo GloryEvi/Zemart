@@ -117,8 +117,14 @@ const Navbar = () => {
       </NavLink>
 
       <div className="hidden sm:flex items-center gap-8">
+        <NavLink
+          to="/seller"
+          className="border border-blue-500 px-2 py-0.5 rounded-full hover:bg-blue-50 transition text-sm"
+        >
+          Seller
+        </NavLink>
         <NavLink to="/">Home</NavLink>
-        <NavLink to="/products">All Product</NavLink>
+        <NavLink to="/products">Products</NavLink>
         <NavLink to="/">Contact</NavLink>
 
         <div className="hidden lg:flex items-center text-sm gap-2 border border-gray-300 px-3 rounded-full">
@@ -238,8 +244,11 @@ const Navbar = () => {
           <NavLink to="/" onClick={() => setOpen(false)}>
             Home
           </NavLink>
+          <NavLink to="/seller" onClick={() => setOpen(false)}>
+            Seller
+          </NavLink>
           <NavLink to="/products" onClick={() => setOpen(false)}>
-            All Product
+            Products
           </NavLink>
           {user && (
             <NavLink to="/products" onClick={() => setOpen(false)}>
