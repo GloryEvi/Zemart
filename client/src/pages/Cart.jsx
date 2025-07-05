@@ -29,8 +29,11 @@ const Cart = () => {
     let tempArray = [];
     for (const key in cartItems) {
       const product = products.find((item) => item._id === key);
-      product.quantity = cartItems[key];
-      tempArray.push(product);
+      // Only add to cart if product exists
+      if (product) {
+        product.quantity = cartItems[key];
+        tempArray.push(product);
+      }
     }
     setCartArray(tempArray);
   };
@@ -144,12 +147,18 @@ const Cart = () => {
               >
                 <img
                   className="max-w-full h-full object-cover"
-                  src={product.image[0]}
-                  alt={product.name}
+                  src={
+                    product.image && product.image[0]
+                      ? product.image[0]
+                      : assets.box_icon
+                  }
+                  alt={product.name || "Product"}
                 />
               </div>
               <div>
-                <p className="hidden md:block font-semibold">{product.name}</p>
+                <p className="hidden md:block font-semibold">
+                  {product.name || "Product no longer available"}
+                </p>
                 <div className="font-normal text-gray-500/70">
                   <p>
                     Weight: <span>{product.weight || "N/A"}</span>
@@ -179,7 +188,9 @@ const Cart = () => {
             </div>
             <p className="text-center">
               {currency}
-              {product.offerPrice * product.quantity}
+              {product.offerPrice
+                ? product.offerPrice * product.quantity
+                : "N/A"}
             </p>
             <button
               onClick={() => removeFromCart(product._id)}
