@@ -26,6 +26,10 @@ const Cart = () => {
   const [paymentOption, setPaymentOption] = useState("COD");
 
   const getCart = () => {
+    if (!products || !Array.isArray(products) || !cartItems) {
+      return;
+    }
+
     let tempArray = [];
     for (const key in cartItems) {
       const product = products.find((item) => item._id === key);
@@ -105,7 +109,7 @@ const Cart = () => {
   };
 
   useEffect(() => {
-    if (products.length > 0 && cartItems) {
+    if (products && Array.isArray(products) && cartItems) {
       getCart();
     }
   }, [products, cartItems]);
@@ -116,7 +120,34 @@ const Cart = () => {
     }
   }, [user]);
 
-  return products.length > 0 && cartItems ? (
+  // Show loading state while products are being fetched
+  if (!products || products.length === 0) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <p className="text-gray-500">Loading cart...</p>
+      </div>
+    );
+  }
+
+  // Show empty cart if no items
+  if (!cartArray || cartArray.length === 0) {
+    return (
+      <div className="text-center mt-16">
+        <p className="text-gray-500">Your cart is empty</p>
+        <button
+          onClick={() => {
+            navigate("/products");
+            scrollTo(0, 0);
+          }}
+          className="mt-4 bg-primary text-white px-6 py-2 rounded hover:bg-primary-dull transition"
+        >
+          Continue Shopping
+        </button>
+      </div>
+    );
+  }
+
+  return (
     <div className="flex flex-col md:flex-row mt-16">
       <div className="flex-1 max-w-4xl">
         <h1 className="text-3xl font-medium mb-6">
@@ -132,48 +163,63 @@ const Cart = () => {
 
         {cartArray.map((product, index) => (
           <div
-            key={index}
+            key={product._id || index}
             className="grid grid-cols-[2fr_1fr_1fr] text-gray-500 items-center text-sm md:text-base font-medium pt-3"
           >
             <div className="flex items-center md:gap-6 gap-3">
               <div
                 onClick={() => {
-                  navigate(
-                    `/products/${product.category.toLowerCase()}/${product._id}`
-                  );
-                  scrollTo(0, 0);
+                  if (product && product.category && product._id) {
+                    navigate(
+                      `/products/${product.category.toLowerCase()}/${
+                        product._id
+                      }`
+                    );
+                    scrollTo(0, 0);
+                  }
                 }}
                 className="cursor-pointer w-24 h-24 flex items-center justify-center border border-gray-300 rounded"
               >
                 <img
                   className="max-w-full h-full object-cover"
                   src={
-                    product.image && product.image[0]
+                    product && product.image && product.image[0]
                       ? product.image[0]
                       : assets.box_icon
                   }
-                  alt={product.name || "Product"}
+                  alt={product && product.name ? product.name : "Product"}
                 />
               </div>
               <div>
                 <p className="hidden md:block font-semibold">
-                  {product.name || "Product no longer available"}
+                  {product && product.name
+                    ? product.name
+                    : "Product no longer available"}
                 </p>
                 <div className="font-normal text-gray-500/70">
                   <p>
-                    Weight: <span>{product.weight || "N/A"}</span>
+                    Weight:{" "}
+                    <span>
+                      {product && product.weight ? product.weight : "N/A"}
+                    </span>
                   </p>
                   <div className="flex items-center">
                     <p>Qty:</p>
                     <select
                       onChange={(e) =>
+                        product &&
+                        product._id &&
                         updateCartItem(product._id, Number(e.target.value))
                       }
-                      value={cartItems[product._id]}
+                      value={
+                        product && product._id ? cartItems[product._id] : 1
+                      }
                       className="outline-none"
                     >
                       {Array(
-                        cartItems[product._id] > 9 ? cartItems[product._id] : 9
+                        product && product._id && cartItems[product._id] > 9
+                          ? cartItems[product._id]
+                          : 9
                       )
                         .fill("")
                         .map((_, index) => (
@@ -188,12 +234,14 @@ const Cart = () => {
             </div>
             <p className="text-center">
               {currency}
-              {product.offerPrice
+              {product && product.offerPrice && product.quantity
                 ? product.offerPrice * product.quantity
                 : "N/A"}
             </p>
             <button
-              onClick={() => removeFromCart(product._id)}
+              onClick={() =>
+                product && product._id && removeFromCart(product._id)
+              }
               className="cursor-pointer mx-auto"
             >
               <img
@@ -242,7 +290,7 @@ const Cart = () => {
               Change
             </button>
             {showAddress && (
-              <div className="absolute top-12 py-1 bg-white border border-gray-300 text-sm w-full">
+              <div className="absolute top-12 py-1 bg-white border border-gray-300 text-sm w-full z-10">
                 {user ? (
                   <>
                     {addresses.map((address, index) => (
@@ -326,7 +374,7 @@ const Cart = () => {
         </button>
       </div>
     </div>
-  ) : null;
+  );
 };
 
 export default Cart;
